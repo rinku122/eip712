@@ -1,4 +1,6 @@
 import Web3 from "web3";
+var ethUtil = require("ethereumjs-util");
+var sigUtil = require("eth-sig-util");
 
 export default class RPC {
   constructor(provider) {
@@ -70,10 +72,29 @@ export default class RPC {
       //   async function (err, result) {
       //     if (err) return console.dir(err);
       //     if (result.error) {
-      //       alert(result.error.message);
+      //       console.log(result.error.message);
       //     }
       //     if (result.error) return console.error("ERROR", result);
       //     console.log("TYPED SIGNED:" + JSON.stringify(result.result));
+
+      //     const recovered = sigUtil.recoverTypedSignature({
+      //       data: JSON.parse(msgData),
+      //       sig: result.result,
+      //     });
+
+      //     if (
+      //       ethUtil.toChecksumAddress(recovered) ===
+      //       ethUtil.toChecksumAddress(address)
+      //     ) {
+      //       console.log("Successfully ecRecovered signer as " + address);
+      //     } else {
+      //       console.log(
+      //         "Failed to verify signer when comparing " +
+      //           result.result +
+      //           " to " +
+      //           address
+      //       );
+      //     }
       //   }
       // );
       //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -82,6 +103,21 @@ export default class RPC {
         params: [address, msgData],
       });
       console.log("TYPED SIGNED:" + JSON.stringify(sig));
+      const recovered = sigUtil.recoverTypedSignature({
+        data: JSON.parse(msgData),
+        sig,
+      });
+
+      if (
+        ethUtil.toChecksumAddress(recovered) ===
+        ethUtil.toChecksumAddress(address)
+      ) {
+        console.log("Successfully ecRecovered signer as " + address);
+      } else {
+        console.log(
+          "Failed to verify signer when comparing " + sig + " to " + address
+        );
+      }
     } catch (er) {
       console.error(er?.message);
       return er;
